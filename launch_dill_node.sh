@@ -75,9 +75,9 @@ sleep 3
 tlog "Checking if the node is up and running..."
 dill_proc=`ps -ef | grep dill | grep light | grep -v grep | grep 0x1a5E568E5b26A95526f469E8d9AC6d1C30432B33`
 if [ ! -z "$dill_proc" ]; then
-    tlog "node running, congratulations 😄"
+    echo "node running, congratulations 😄"
 else 
-    tlog "node not running, something went wrong 😢"
+    echo "node not running, something went wrong!!! 😢"
     exit 1
 fi
 
