@@ -67,7 +67,11 @@ cat ./dill/validator_keys/deposit_data-xxxx.json
 
 ![image](./pics/staking_transaction.png)
 
-- Yes, that's all. After these operations, you can check it with your public key (prefixed with 0x) on the last pages in the validators section in Explorer https://andes.dill.xyz/validators. It may take 1 hour to appear.
+- Yes, that's all. After these operations, you can check it with your public key in the validators section in Explorer https://andes.dill.xyz/validators. It may take 1 hour to appear.
 ![image](./pics/validato_search.png)
 
 ------
+
+# Acknowledgements
+>- [dill-light-validator-setup](https://github.com/99kartlos/dill-light-validator-setup):  The writing style and script implementation in this repository inspired me a lot
+>
