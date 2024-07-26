@@ -85,4 +85,4 @@ deposit_file=$(ls -t $DILL_DIR/validator_keys/deposit_data-* | head -n 1)
 pubkeys=($(grep -o '"pubkey": "[^"]*' $deposit_file | sed 's/"pubkey": "//')) 
 echo -e "\033[0;36mvalidator pubkey\033[0m: $pubkeys"
 
-echo -e "\033[0;31mPlease backup this directory $DILL_DIR/validator_keys, if you want to restore it on another machine\033[0m"
+echo -e "\033[0;31mPlease backup this directory $DILL_DIR/validator_keys. Required for recovery and migration. Important ！！！\033[0m"

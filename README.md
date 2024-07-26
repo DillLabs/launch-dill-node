@@ -43,7 +43,7 @@ If you completed all the steps correctly, you will get an output similar to this
 ```
 node running, congratulations 😄
 validator pubkey: xxxxxx
-Please backup this directory /data/launch-dill-node/dill/validator_keys, if you want to restore it on another machine
+Please backup this directory $YOUR_SCRIPT_PATH/dill/validator_keys. Required for recovery and migration. Important ！！！
 ```
 ------
 
@@ -67,6 +67,7 @@ cat ./dill/validator_keys/deposit_data-xxxx.json
 
 ![image](https://github.com/user-attachments/assets/8d9ca2aa-3458-4705-a37e-56509d279894)
 
-- Yes, that's all. After these operations, you can check it with your public key (prefixed with 0x) on the last pages in the validators section in Explorer https://andes.dill.xyz/validators. It may take 1~2 hours to appear
+- Yes, that's all. After these operations, you can check it with your public key (prefixed with 0x) on the last pages in the validators section in Explorer https://andes.dill.xyz/validators. It may take 1 hour to appear.
+![image](./pics/validato_search.png)
 
 ------
