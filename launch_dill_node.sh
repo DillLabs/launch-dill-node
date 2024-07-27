@@ -57,10 +57,45 @@ KEYS_DIR="$DILL_DIR/validator_keys"
 KEYSTORE_DIR="$DILL_DIR/keystore"
 PASSWORD_FILE="$KEYS_DIR/keystore_password.txt"
 
+# check env variables LC_ALL and LANG
+locale_a_value=$(locale -a)
+locale_a_lower_value=$(echo $locale_a_value | tr '[:upper:]' '[:lower:]')
+
+lc_all_value=$(echo "$LC_ALL")
+lc_all_lower_value=$(echo "$LC_ALL" | tr '[:upper:]' '[:lower:]' | sed 's/-//g')
+if ! echo $locale_a_lower_value | grep -q "\<$lc_all_lower_value\>"; then
+    if echo $locale_a_lower_value | grep -q "c.utf8"; then
+        export LC_ALL=C.UTF-8
+        echo "LC_ALL value $lc_all_value not found in locale -a ($locale_a_value), and set to C.UTF-8 now"
+    else
+        echo "LC_ALL value $lc_all_value not found in locale -a ($locale_a_value), and can't set to C.UTF-8!!!"
+    fi
+else
+    echo "LC_ALL $lc_all_value is in locale -a ($locale_a_value)"
+fi
+
+lang_value=$(echo "$LANG")
+lang_lower_value=$(echo "$LANG" | tr '[:upper:]' '[:lower:]' | sed 's/-//g')
+if ! echo $locale_a_lower_value | grep -q "\<$lang_lower_value\>"; then
+    if echo $locale_a_lower_value | grep -q "c.utf8"; then
+        export LANG=C.UTF-8
+        echo "LANG value $lang_value not found in locale -a ($locale_a_value), and set to C.UTF-8 now"
+    else
+        echo "LANG value $lang_value not found in locale -a ($locale_a_value), and can't set to C.UTF-8"
+    fi
+else
+    echo "LANG $lang_value is in locale -a ($locale_a_value)"
+fi
+
 cd $DILL_DIR
 # Generate validator keys
 tlog "Generating validator keys..."
 ./dill_validators_gen new-mnemonic --num_validators=1 --chain=andes --deposit_amount 2500 --save_password --save_mnemonic
+ret=$?
+if [ $ret -ne 0 ]; then
+    echo "dill_validators_gen failed"
+    exit 1
+fi
 
 # Import your keys to your keystore
 tlog "Importing keys to keystore..."
