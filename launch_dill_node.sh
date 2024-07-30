@@ -25,6 +25,10 @@ if [ "$os_type" == "Darwin" ];then
     fi
 else
     if [ "$chip" == "x86_64" ] && [ -f /etc/os-release ];then
+        if ! grep -qi "flags.*:.*adx" /proc/cpuinfo; then
+            tlog "Unsupported CPU: Missing the required instruction set extension (adx)"
+            exit 1
+        fi
         source /etc/os-release
         if [ "$ID" == "ubuntu" ];then
             tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
