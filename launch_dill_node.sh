@@ -11,14 +11,14 @@ tlog() {
 os_type=$(uname)
 chip=$(uname -m)
 
-DILL_DARWIN_ARM64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.0/dill-v1.0.0-darwin-arm64.tar.gz"
-DILL_LINUX_AMD64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.0/dill-v1.0.0-linux-amd64.tar.gz"
+DILL_DARWIN_ARM64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-darwin-arm64.tar.gz"
+DILL_LINUX_AMD64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-linux-amd64.tar.gz"
 
 if [ "$os_type" == "Darwin" ];then
     if [ "$chip" == "arm64" ];then
         tlog "supported, os_type: $os_type, chip: $chip"
         curl -O $DILL_DARWIN_ARM64_URL
-        tar -zxvf dill-v1.0.0-darwin-arm64.tar.gz
+        tar -zxvf dill-v1.0.1-darwin-arm64.tar.gz
     else
         tlog "Unsupported, os_type: $os_type, chip: $chip"
         exit 1
@@ -29,7 +29,7 @@ else
         if [ "$ID" == "ubuntu" ];then
             tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
             curl -O $DILL_LINUX_AMD64_URL
-            tar -zxvf dill-v1.0.0-linux-amd64.tar.gz
+            tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
         else
             tlog "Unsupported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
             exit 1
