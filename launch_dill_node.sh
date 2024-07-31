@@ -31,9 +31,15 @@ else
         fi
         source /etc/os-release
         if [ "$ID" == "ubuntu" ];then
-            tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
-            curl -O $DILL_LINUX_AMD64_URL
-            tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
+            major_version=$(echo $VERSION_ID | cut -d. -f1)
+            if [ $major_version -ge 20 ]; then
+                tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
+                curl -O $DILL_LINUX_AMD64_URL
+                tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
+            else
+                tlog "Unsupported Ubuntu version: $VERSION_ID"
+                exit 1
+            fi
         else
             tlog "Unsupported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
             exit 1
@@ -94,11 +100,21 @@ mnemonic_path="$DILL_DIR/validator_keys/mnemonic.txt"
 # Check if the file exists and has content
 if [ -s "$mnemonic_path" ]; then
     echo "File $mnemonic_path exists and has content. Please move the file if the content is important, as it will be overwritten."
-    read -p "Do you want to overwrite the file? (yes/no): " response
-    if [ "$response" != "yes" ]; then
-        echo "Please move the $mnemonic_path file, and rerun the script"
-        exit 1
-    fi
+    while true; do
+        read -p "Do you want to overwrite the file? (yes/no): " response
+        case "$response" in
+            "yes")
+                break
+                ;;
+            "no")
+                echo "Please move the $mnemonic_path file, and rerun the script"
+                exit 1
+                ;;
+            *)
+                echo "Invalid response. Please enter 'yes' or 'no'."
+                ;;
+        esac
+    done
 fi
 
 ./dill_validators_gen generate-mnemonic --mnemonic_path $mnemonic_path
