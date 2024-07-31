@@ -34,8 +34,8 @@ else
             major_version=$(echo $VERSION_ID | cut -d. -f1)
             if [ $major_version -ge 20 ]; then
                 tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
-                curl -O $DILL_LINUX_AMD64_URL
-                tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
+                #curl -O $DILL_LINUX_AMD64_URL
+                #tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
             else
                 tlog "Unsupported Ubuntu version: $VERSION_ID"
                 exit 1
@@ -103,10 +103,10 @@ if [ -s "$mnemonic_path" ]; then
     while true; do
         read -p "Do you want to overwrite the file? (yes/no): " response
         case "$response" in
-            "yes")
+            "yes" | "YES")
                 break
                 ;;
-            "no")
+            "no" | "NO")
                 echo "Please move the $mnemonic_path file, and rerun the script"
                 exit 1
                 ;;
@@ -117,16 +117,38 @@ if [ -s "$mnemonic_path" ]; then
     done
 fi
 
-./dill_validators_gen generate-mnemonic --mnemonic_path $mnemonic_path
-ret=$?
-if [ $ret -ne 0 ]; then
-    echo "dill_validators_gen generate-mnemonic failed"
-    exit 1
-fi
+mnemonic=""
+save_mnemonic=""
+read -p "Do you want to generate a new mnemonic? (Press Enter for new / type 'no' to use existing): " generate_new
+while true; do
+    case "$generate_new" in
+        "" | "yes")
+            ./dill_validators_gen generate-mnemonic --mnemonic_path $mnemonic_path
+            ret=$?
+            if [ $ret -ne 0 ]; then
+                echo "dill_validators_gen generate-mnemonic failed"
+                exit 1
+            fi
+            save_mnemonic="yes"
+            mnemonic="$(cat $mnemonic_path)"
+            break
+            ;;
+        "no")
+            read -p "Enter the existing mnemonic: " existing_mnemonic
+            mnemonic="$existing_mnemonic"
+            break
+            ;;
+        *)
+            echo "Invalid response. Please press Enter for new or type 'no' for existing."
+            read -p "Do you want to generate a new mnemonic? (Press Enter for new / type 'no' to use existing): " generate_new
+            ;;
+    esac
+done
 
 # wait enter password
 password=""
 pwd_path="$DILL_DIR/validator_keys/keystore_password.txt"
+echo ""
 while true; do
     read -s -p "Create a password that secures your validator keystore(s). (minimum 8 characters): " password
     if [ ${#password} -ge 8 ]; then
@@ -139,10 +161,10 @@ echo $password > $pwd_path
 
 # Generate validator keys
 echo ""; tlog "Generating validator keys..."
-./dill_validators_gen existing-mnemonic --mnemonic="$(cat $mnemonic_path)" --validator_start_index=0 --num_validators=1 --chain=andes --deposit_amount=2500 --keystore_password="$password"
+./dill_validators_gen existing-mnemonic --mnemonic="$mnemonic" --validator_start_index=0 --num_validators=1 --chain=andes --deposit_amount=2500 --keystore_password="$password"
 ret=$?
 if [ $ret -ne 0 ]; then
-    echo "dill_validators_gen failed"
+    echo "dill_validators_gen existing-mnemonic failed"
     exit 1
 fi
 
@@ -169,4 +191,6 @@ deposit_file=$(ls -t $DILL_DIR/validator_keys/deposit_data-* | head -n 1)
 pubkeys=($(grep -o '"pubkey": "[^"]*' $deposit_file | sed 's/"pubkey": "//')) 
 echo -e "\033[0;36mvalidator pubkey\033[0m: $pubkeys"
 
-echo -e "\033[0;31mPlease backup $mnemonic_path. Required for recovery and migration. Important ！！！\033[0m"
+if [ "$save_mnemonic" == "yes" ]; then
+    echo -e "\033[0;31mPlease backup $mnemonic_path. Required for recovery and migration. Important ！！！\033[0m"
+fi
