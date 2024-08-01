@@ -31,9 +31,15 @@ else
         fi
         source /etc/os-release
         if [ "$ID" == "ubuntu" ];then
-            tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
-            curl -O $DILL_LINUX_AMD64_URL
-            tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
+            major_version=$(echo $VERSION_ID | cut -d. -f1)
+            if [ $major_version -ge 20 ]; then
+                tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
+                #curl -O $DILL_LINUX_AMD64_URL
+                #tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
+            else
+                tlog "Unsupported Ubuntu version: $VERSION_ID"
+                exit 1
+            fi
         else
             tlog "Unsupported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
             exit 1
@@ -74,8 +80,6 @@ if ! echo $locale_a_lower_value | grep -q "\<$lc_all_lower_value\>"; then
     else
         echo "LC_ALL value $lc_all_value not found in locale -a ($locale_a_value), and can't set to C.UTF-8!!!"
     fi
-else
-    echo "LC_ALL $lc_all_value is in locale -a ($locale_a_value)"
 fi
 
 lang_value=$(echo "$LANG")
@@ -87,17 +91,80 @@ if ! echo $locale_a_lower_value | grep -q "\<$lang_lower_value\>"; then
     else
         echo "LANG value $lang_value not found in locale -a ($locale_a_value), and can't set to C.UTF-8"
     fi
-else
-    echo "LANG $lang_value is in locale -a ($locale_a_value)"
 fi
 
 cd $DILL_DIR
+# Generate mnemonic
+tlog "Generating mnemonic"
+mnemonic_path="$DILL_DIR/validator_keys/mnemonic.txt"
+# Check if the file exists and has content
+if [ -s "$mnemonic_path" ]; then
+    echo "File $mnemonic_path exists and has content. Please move the file if the content is important, as it will be overwritten."
+    while true; do
+        read -p "Do you want to overwrite the file? (yes/no): " response
+        case "$response" in
+            "yes" | "YES")
+                break
+                ;;
+            "no" | "NO")
+                echo "Please move the $mnemonic_path file, and rerun the script"
+                exit 1
+                ;;
+            *)
+                echo "Invalid response. Please enter 'yes' or 'no'."
+                ;;
+        esac
+    done
+fi
+
+mnemonic=""
+save_mnemonic=""
+read -p "Do you want to generate a new mnemonic? (Press Enter for new / type 'no' to use existing): " generate_new
+while true; do
+    case "$generate_new" in
+        "" | "yes")
+            ./dill_validators_gen generate-mnemonic --mnemonic_path $mnemonic_path
+            ret=$?
+            if [ $ret -ne 0 ]; then
+                echo "dill_validators_gen generate-mnemonic failed"
+                exit 1
+            fi
+            save_mnemonic="yes"
+            mnemonic="$(cat $mnemonic_path)"
+            break
+            ;;
+        "no")
+            read -p "Enter the existing mnemonic: " existing_mnemonic
+            mnemonic="$existing_mnemonic"
+            break
+            ;;
+        *)
+            echo "Invalid response. Please press Enter for new or type 'no' for existing."
+            read -p "Do you want to generate a new mnemonic? (Press Enter for new / type 'no' to use existing): " generate_new
+            ;;
+    esac
+done
+
+# wait enter password
+password=""
+echo ""
+while true; do
+    read -s -p "Create a password that secures your validator keystore(s). (minimum 8 characters): " password
+    if [ ${#password} -ge 8 ]; then
+        break
+    else
+        echo "Password must be at least 8 characters long."
+    fi
+done
+[ ! -d "$KEYS_DIR" ] && mkdir -p "$KEYS_DIR"
+echo $password > $PASSWORD_FILE
+
 # Generate validator keys
-tlog "Generating validator keys..."
-./dill_validators_gen new-mnemonic --num_validators=1 --chain=andes --deposit_amount 2500 --save_password --save_mnemonic
+echo ""; tlog "Generating validator keys..."
+./dill_validators_gen existing-mnemonic --mnemonic="$mnemonic" --validator_start_index=0 --num_validators=1 --chain=andes --deposit_amount=2500 --keystore_password="$password"
 ret=$?
 if [ $ret -ne 0 ]; then
-    echo "dill_validators_gen failed"
+    echo "dill_validators_gen existing-mnemonic failed"
     exit 1
 fi
 
@@ -112,7 +179,7 @@ tlog "Starting light validator node..."
 sleep 3
 # Check if the node is up and running
 tlog "Checking if the node is up and running..."
-dill_proc=`ps -ef | grep dill | grep light | grep -v grep | grep 0x1a5E568E5b26A95526f469E8d9AC6d1C30432B33`
+dill_proc=`ps -ef | grep dill | grep light`
 if [ ! -z "$dill_proc" ]; then
     echo "node running, congratulations 😄"
 else 
@@ -124,4 +191,6 @@ deposit_file=$(ls -t $DILL_DIR/validator_keys/deposit_data-* | head -n 1)
 pubkeys=($(grep -o '"pubkey": "[^"]*' $deposit_file | sed 's/"pubkey": "//')) 
 echo -e "\033[0;36mvalidator pubkey\033[0m: $pubkeys"
 
-echo -e "\033[0;31mPlease backup this directory $DILL_DIR/validator_keys. Required for recovery and migration. Important ！！！\033[0m"
+if [ "$save_mnemonic" == "yes" ]; then
+    echo -e "\033[0;31mPlease backup $mnemonic_path. Required for recovery and migration. Important ！！！\033[0m"
+fi
