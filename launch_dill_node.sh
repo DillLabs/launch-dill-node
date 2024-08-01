@@ -147,7 +147,6 @@ done
 
 # wait enter password
 password=""
-pwd_path="$DILL_DIR/validator_keys/keystore_password.txt"
 echo ""
 while true; do
     read -s -p "Create a password that secures your validator keystore(s). (minimum 8 characters): " password
@@ -157,7 +156,8 @@ while true; do
         echo "Password must be at least 8 characters long."
     fi
 done
-echo $password > $pwd_path
+[ ! -d "$KEYS_DIR" ] && mkdir -p "$KEYS_DIR"
+echo $password > $PASSWORD_FILE
 
 # Generate validator keys
 echo ""; tlog "Generating validator keys..."
