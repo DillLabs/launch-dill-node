@@ -34,8 +34,8 @@ else
             major_version=$(echo $VERSION_ID | cut -d. -f1)
             if [ $major_version -ge 20 ]; then
                 tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
-                #curl -O $DILL_LINUX_AMD64_URL
-                #tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
+                curl -O $DILL_LINUX_AMD64_URL
+                tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
             else
                 tlog "Unsupported Ubuntu version: $VERSION_ID"
                 exit 1
