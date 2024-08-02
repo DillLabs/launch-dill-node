@@ -3,10 +3,6 @@
 _ROOT="$(pwd)" && cd "$(dirname "$0")" && ROOT="$(pwd)"
 PJROOT="$ROOT"
 
-tlog() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S %Z') > $*"
-}
-
 # Ask for OS type
 os_type=$(uname)
 chip=$(uname -m)
@@ -14,38 +10,41 @@ chip=$(uname -m)
 DILL_DARWIN_ARM64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-darwin-arm64.tar.gz"
 DILL_LINUX_AMD64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-linux-amd64.tar.gz"
 
+echo "********** Step 1: Checking hardware/OS and downloading dill software package **********"
+echo ""
+
 if [ "$os_type" == "Darwin" ];then
     if [ "$chip" == "arm64" ];then
-        tlog "supported, os_type: $os_type, chip: $chip"
+        echo "Supported, os_type: $os_type, chip: $chip"
         curl -O $DILL_DARWIN_ARM64_URL
         tar -zxvf dill-v1.0.1-darwin-arm64.tar.gz
     else
-        tlog "Unsupported, os_type: $os_type, chip: $chip"
+        echo "Unsupported, os_type: $os_type, chip: $chip"
         exit 1
     fi
 else
     if [ "$chip" == "x86_64" ] && [ -f /etc/os-release ];then
         if ! grep -qi "flags.*:.*adx" /proc/cpuinfo; then
-            tlog "Unsupported CPU: Missing the required instruction set extension (adx)"
+            echo "Unsupported CPU: Missing the required instruction set extension (adx)"
             exit 1
         fi
         source /etc/os-release
         if [ "$ID" == "ubuntu" ];then
             major_version=$(echo $VERSION_ID | cut -d. -f1)
             if [ $major_version -ge 20 ]; then
-                tlog "supported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
+                echo "Supported, os: $ID $VERSION_ID, chip: $chip"; echo""
                 curl -O $DILL_LINUX_AMD64_URL
                 tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
             else
-                tlog "Unsupported Ubuntu version: $VERSION_ID"
+                echo "Unsupported, os: $ID $VERSION_ID (ubuntu 20.04+ required)"
                 exit 1
             fi
         else
-            tlog "Unsupported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
+            echo "Unsupported, os_type: $os_type, chip: $chip, $ID $VERSION_ID"
             exit 1
         fi
     else
-        tlog "Unsupported, os_type: $os_type, chip: $chip"
+        echo "Unsupported, os_type: $os_type, chip: $chip"
         exit 1
     fi
 fi
@@ -93,36 +92,26 @@ if ! echo $locale_a_lower_value | grep -q "\<$lang_lower_value\>"; then
     fi
 fi
 
-cd $DILL_DIR
-# Generate mnemonic
-tlog "Generating mnemonic"
-mnemonic_path="$DILL_DIR/validator_keys/mnemonic.txt"
-# Check if the file exists and has content
-if [ -s "$mnemonic_path" ]; then
-    echo "File $mnemonic_path exists and has content. Please move the file if the content is important, as it will be overwritten."
-    while true; do
-        read -p "Do you want to overwrite the file? (yes/no): " response
-        case "$response" in
-            "yes" | "YES")
-                break
-                ;;
-            "no" | "NO")
-                echo "Please move the $mnemonic_path file, and rerun the script"
-                exit 1
-                ;;
-            *)
-                echo "Invalid response. Please enter 'yes' or 'no'."
-                ;;
-        esac
-    done
-fi
+echo ""
+echo "Step 1 Completed. Press any key to continue..."
+read -n 1 -s -r
+echo ""  # Move to a new line after the key press
 
+echo ""
+echo "********** Step 2: Generating Validator Keys **********"
+echo ""
+
+echo "Validator Keys are generated from a mnemonic"
 mnemonic=""
 save_mnemonic=""
-read -p "Do you want to generate a new mnemonic? (Press Enter for new / type 'no' to use existing): " generate_new
+timestamp=$(date +%s)
+mnemonic_path="$DILL_DIR/validator_keys/mnemonic-$timestamp.txt"
+cd $DILL_DIR
 while true; do
-    case "$generate_new" in
-        "" | "yes")
+    read -p "Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]: " mne_src
+    mne_src=${mne_src:-1}  # Set default choice to 1
+    case "$mne_src" in
+        "1" | "new")
             ./dill_validators_gen generate-mnemonic --mnemonic_path $mnemonic_path
             ret=$?
             if [ $ret -ne 0 ]; then
@@ -133,14 +122,19 @@ while true; do
             mnemonic="$(cat $mnemonic_path)"
             break
             ;;
-        "no")
-            read -p "Enter the existing mnemonic: " existing_mnemonic
-            mnemonic="$existing_mnemonic"
-            break
+        "2" | "existing")
+            read -p "Enter your existing mnemonic: " existing_mnemonic
+            if [[ $existing_mnemonic =~ ^([a-zA-Z]+[[:space:]]+){11,}[a-zA-Z]+$ ]]; then
+                mnemonic="$existing_mnemonic"
+                break
+            else
+                echo ""
+                echo "[Error]Invalid mnemonic format. A valid mnemonic should consist of 12 or more space-separated words."
+            fi
             ;;
         *)
-            echo "Invalid response. Please press Enter for new or type 'no' for existing."
-            read -p "Do you want to generate a new mnemonic? (Press Enter for new / type 'no' to use existing): " generate_new
+            echo ""
+            echo "[Error] $mne_src is not a valid mnemonic source option"
             ;;
     esac
 done
@@ -148,37 +142,44 @@ done
 # wait enter password
 password=""
 echo ""
-while true; do
-    read -s -p "Create a password that secures your validator keystore(s). (minimum 8 characters): " password
-    if [ ${#password} -ge 8 ]; then
-        break
-    else
-        echo "Password must be at least 8 characters long."
-    fi
-done
+echo "Generate a random password that secures your validator keystore(s)."
+password=$(openssl rand -base64 12)  # Generate a random password
+echo ""
+echo "Generated password: $password"
+echo ""
+echo "The password will be saved to $PASSWORD_FILE. Press any key to continue..."
+read -n 1 -s -r
+echo ""  # Move to a new line after the key press
 [ ! -d "$KEYS_DIR" ] && mkdir -p "$KEYS_DIR"
 echo $password > $PASSWORD_FILE
 
 # Generate validator keys
-echo ""; tlog "Generating validator keys..."
 ./dill_validators_gen existing-mnemonic --mnemonic="$mnemonic" --validator_start_index=0 --num_validators=1 --chain=andes --deposit_amount=2500 --keystore_password="$password"
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "dill_validators_gen existing-mnemonic failed"
     exit 1
 fi
+echo ""
+echo "Step 2 Completed. Press any key to continue..."
+read -n 1 -s -r
+echo ""  # Move to a new line after the key press
+
+echo ""
+echo "********** Step 3: Import keys and start dill-node **********"
+echo ""
 
 # Import your keys to your keystore
-tlog "Importing keys to keystore..."
+echo "Importing keys to keystore..."
 ./dill-node accounts import --andes --wallet-dir $KEYSTORE_DIR --keys-dir $KEYS_DIR --accept-terms-of-use --account-password-file $PASSWORD_FILE --wallet-password-file $PASSWORD_FILE
 
 # Start the light validator node
-tlog "Starting light validator node..."
+echo "Starting light validator node..."
 ./start_light.sh
 
 sleep 3
 # Check if the node is up and running
-tlog "Checking if the node is up and running..."
+echo "Checking if the node is up and running..."
 dill_proc=`ps -ef | grep dill | grep light`
 if [ ! -z "$dill_proc" ]; then
     echo "node running, congratulations 😄"
@@ -194,3 +195,8 @@ echo -e "\033[0;36mvalidator pubkey\033[0m: $pubkeys"
 if [ "$save_mnemonic" == "yes" ]; then
     echo -e "\033[0;31mPlease backup $mnemonic_path. Required for recovery and migration. Important ！！！\033[0m"
 fi
+
+echo ""
+echo "Step 3 Completed. The whole process finished. Press any key..."
+read -n 1 -s -r
+echo ""  # Move to a new line after the key press
