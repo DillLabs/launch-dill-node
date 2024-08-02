@@ -10,6 +10,7 @@ chip=$(uname -m)
 DILL_DARWIN_ARM64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-darwin-arm64.tar.gz"
 DILL_LINUX_AMD64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-linux-amd64.tar.gz"
 
+echo ""
 echo "********** Step 1: Checking hardware/OS and downloading dill software package **********"
 echo ""
 
