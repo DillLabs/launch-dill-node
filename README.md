@@ -29,7 +29,7 @@ Light validator is a type of node that performs availability validation solely t
 Open your terminal and execute the following command to download and run the script:
 
    ```sh
-   curl -O https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/launch_dill_node.sh  && chmod +x launch_dill_node.sh && ./launch_dill_node.sh
+   curl -sO https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/launch_dill_node.sh  && chmod +x launch_dill_node.sh && ./launch_dill_node.sh
    ```
 
 If the dill node launched successfully, you will get an output similar to this:
