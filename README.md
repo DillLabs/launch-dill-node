@@ -24,7 +24,7 @@ Network Bandwidth | 1MB/s
 Light validator is a type of node that performs availability validation solely through data sampling without participating in data sharding synchronization. It is also part of a consensus network. These nodes can participate in voting but will not act as proposers to generate new blocks. You can follow the steps below to start a light validator:
 
 
-1. **Download and run the setup script:**
+**Download and run the setup script:**
 
 Open your terminal and execute the following command to download and run the script:
 
@@ -32,18 +32,12 @@ Open your terminal and execute the following command to download and run the scr
    curl -O https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/launch_dill_node.sh  && chmod +x launch_dill_node.sh && ./launch_dill_node.sh
    ```
 
-2. **Do the following in order** 
-
-- Wait for the files to download.
-- Create a strong password. At least 8 characters long and confirm Keystore Password:
-- Press enter to confirm after validator keys generated 
-
-If you completed all the steps correctly, you will get an output similar to this:
+If the dill node launched successfully, you will get an output similar to this:
 
 ```
 node running, congratulations 😄
 validator pubkey: xxxxxx
-Please backup this directory $YOUR_SCRIPT_PATH/dill/validator_keys. Required for recovery and migration. Important ！！！
+Please backup this directory $YOUR_SCRIPT_PATH/dill/validator_keys/mnemonic-$TIMESTAMP.txt. Required for recovery and migration. Important ！！！
 ```
 ------
 
