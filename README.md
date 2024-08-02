@@ -37,7 +37,7 @@ If the dill node launched successfully, you will get an output similar to this:
 ```
 node running, congratulations 😄
 validator pubkey: xxxxxx
-Please backup this directory $YOUR_SCRIPT_PATH/dill/validator_keys/mnemonic-$TIMESTAMP.txt. Required for recovery and migration. Important ！！！
+Please backup $YOUR_SCRIPT_PATH/dill/validator_keys/mnemonic-$TIMESTAMP.txt. Required for recovery and migration. Important ！！！
 ```
 ------
 
