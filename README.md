@@ -61,8 +61,8 @@ cat ./dill/validator_keys/deposit_data-xxxx.json
 
 ![image](./pics/staking_transaction.png)
 
-- Yes, that's all. After these operations, you can check it with your public key in the validators section in Explorer https://andes.dill.xyz/validators. It may take 1 hour to appear.
-![image](./pics/validato_search.png)
+- Yes, that's all. After these operations, you can check it with your public key in the validators section in Explorer https://andes.dill.xyz/validators. It may take 0.5~1 hour to appear.
+![image](./pics/validator_search.png)
 
 ------
 
