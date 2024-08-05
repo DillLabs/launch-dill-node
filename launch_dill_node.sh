@@ -4,7 +4,7 @@ _ROOT="$(pwd)" && cd "$(dirname "$0")" && ROOT="$(pwd)"
 PJROOT="$ROOT"
 
 # Ask for OS type
-os_type=$(uname)
+os_type=$(uname)   # Darwin or Linux
 chip=$(uname -m)
 
 DILL_DARWIN_ARM64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-darwin-arm64.tar.gz"
@@ -63,7 +63,7 @@ KEYS_DIR="$DILL_DIR/validator_keys"
 KEYSTORE_DIR="$DILL_DIR/keystore"
 PASSWORD_FILE="$KEYS_DIR/keystore_password.txt"
 
-if [ "$os_type" == "x86_64" ];then
+if [ "$os_type" == "Linux" ];then
     # check env variables LC_ALL and LANG
     locale_a_value=$(locale -a)
     locale_a_lower_value=$(echo $locale_a_value | tr '[:upper:]' '[:lower:]')
