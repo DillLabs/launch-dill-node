@@ -7,8 +7,11 @@ PJROOT="$ROOT"
 os_type=$(uname)   # Darwin or Linux
 chip=$(uname -m)
 
-DILL_DARWIN_ARM64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-darwin-arm64.tar.gz"
-DILL_LINUX_AMD64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/v1.0.1/dill-v1.0.1-linux-amd64.tar.gz"
+version="v1.0.2"
+dill_darwin_file="dill-$version-darwin-arm64.tar.gz"
+dill_linux_file="dill-$version-linux-amd64.tar.gz"
+DILL_DARWIN_ARM64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/$version/$dill_darwin_file"
+DILL_LINUX_AMD64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/$version/$dill_linux_file"
 
 echo ""
 echo "********** Step 1: Checking hardware/OS and downloading dill software package **********"
@@ -18,7 +21,7 @@ if [ "$os_type" == "Darwin" ];then
     if [ "$chip" == "arm64" ];then
         echo "Supported, os_type: $os_type, chip: $chip"
         curl -O $DILL_DARWIN_ARM64_URL
-        tar -zxvf dill-v1.0.1-darwin-arm64.tar.gz
+        tar -zxvf $dill_darwin_file
     else
         echo "Unsupported, os_type: $os_type, chip: $chip"
         exit 1
@@ -31,7 +34,7 @@ else
             if [ $major_version -ge 20 ]; then
                 echo "Supported, os: $ID $VERSION_ID, chip: $chip"; echo""
                 curl -O $DILL_LINUX_AMD64_URL
-                tar -zxvf dill-v1.0.1-linux-amd64.tar.gz
+                tar -zxvf $dill_linux_file
             else
                 echo "Unsupported, os: $ID $VERSION_ID (ubuntu 20.04+ required)"
                 exit 1
@@ -171,6 +174,25 @@ echo ""
 # Import your keys to your keystore
 echo "Importing keys to keystore..."
 ./dill-node accounts import --andes --wallet-dir $KEYSTORE_DIR --keys-dir $KEYS_DIR --accept-terms-of-use --account-password-file $PASSWORD_FILE --wallet-password-file $PASSWORD_FILE
+ret=$?
+if [ $ret -eq 132 ]; then
+    # Check if dill-node is a symbolic link
+    if [ -L "dill-node" ]; then
+	old_target=$(readlink -f "dill-node")
+	old_target_name=$(basename "$old_target")
+        echo "Old symbolic link dill-node linked to $old_target_name deleted"
+        rm -f dill-node
+
+        ln -s ./dill-node_blst_portable dill-node
+	ret=$?
+	if [ $ret -ne 0 ]; then
+	    echo "Create symbolic link dill-node failed"
+	else
+            echo "New symbolic link dill-node created, linked to ./dill-node_blst_portable."
+            ./dill-node accounts import --andes --wallet-dir $KEYSTORE_DIR --keys-dir $KEYS_DIR --accept-terms-of-use --account-password-file $PASSWORD_FILE --wallet-password-file $PASSWORD_FILE
+	fi
+    fi
+fi
 
 # Start the light validator node
 echo "Starting light validator node..."
