@@ -1,5 +1,10 @@
 #!/bin/bash
 
+download=1
+if [ $# -ge 1 ];then
+    download=$1
+fi
+
 _ROOT="$(pwd)" && cd "$(dirname "$0")" && ROOT="$(pwd)"
 PJROOT="$ROOT"
 
@@ -7,7 +12,7 @@ PJROOT="$ROOT"
 os_type=$(uname)   # Darwin or Linux
 chip=$(uname -m)
 
-version="v1.0.2"
+version="v1.0.3"
 dill_darwin_file="dill-$version-darwin-arm64.tar.gz"
 dill_linux_file="dill-$version-linux-amd64.tar.gz"
 DILL_DARWIN_ARM64_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/$version/$dill_darwin_file"
@@ -20,8 +25,10 @@ echo ""
 if [ "$os_type" == "Darwin" ];then
     if [ "$chip" == "arm64" ];then
         echo "Supported, os_type: $os_type, chip: $chip"
-        curl -O $DILL_DARWIN_ARM64_URL
-        tar -zxvf $dill_darwin_file
+        if [ "$download" != "0" ];then
+            curl -O $DILL_DARWIN_ARM64_URL
+            tar -zxvf $dill_darwin_file
+        fi
     else
         echo "Unsupported, os_type: $os_type, chip: $chip"
         exit 1
@@ -33,8 +40,10 @@ else
             major_version=$(echo $VERSION_ID | cut -d. -f1)
             if [ $major_version -ge 20 ]; then
                 echo "Supported, os: $ID $VERSION_ID, chip: $chip"; echo""
-                curl -O $DILL_LINUX_AMD64_URL
-                tar -zxvf $dill_linux_file
+                if [ "$download" != "0" ];then
+                    curl -O $DILL_LINUX_AMD64_URL
+                    tar -zxvf $dill_linux_file
+                fi
             else
                 echo "Unsupported, os: $ID $VERSION_ID (ubuntu 20.04+ required)"
                 exit 1
@@ -155,8 +164,36 @@ echo ""  # Move to a new line after the key press
 [ ! -d "$KEYS_DIR" ] && mkdir -p "$KEYS_DIR"
 echo $password > $PASSWORD_FILE
 
+while true; do
+    read -p "Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]: " deposit_option
+    deposit_option=${deposit_option:-1}  # Set default choice to 1
+    case "$deposit_option" in
+        "1")
+            deposit_amount=3600
+            break
+            ;;
+        "2")
+            deposit_amount=36000
+            break
+            ;;
+        *)
+            echo ""
+            echo "[Error] $deposit_option is not a valid option for deposit token amount"
+            ;;
+    esac
+done
+
+while true; do
+    read -p "Please enter your withdrawal address: " with_addr
+    if ! [[ $with_addr =~ ^0x[a-fA-F0-9]{40}$ ]]; then
+        echo "Invalid Ethereum execution address format. It should start with '0x' followed by 40 hexadecimal characters."
+    else 
+        break
+    fi
+done
+
 # Generate validator keys
-./dill_validators_gen existing-mnemonic --mnemonic="$mnemonic" --validator_start_index=0 --num_validators=1 --chain=andes --deposit_amount=2500 --keystore_password="$password"
+./dill_validators_gen existing-mnemonic --mnemonic="$mnemonic" --validator_start_index=0 --num_validators=1 --chain=alps --deposit_amount=$deposit_amount --keystore_password="$password" --execution_address="$with_addr"
 ret=$?
 if [ $ret -ne 0 ]; then
     echo "dill_validators_gen existing-mnemonic failed"
@@ -173,35 +210,40 @@ echo ""
 
 # Import your keys to your keystore
 echo "Importing keys to keystore..."
-./dill-node accounts import --andes --wallet-dir $KEYSTORE_DIR --keys-dir $KEYS_DIR --accept-terms-of-use --account-password-file $PASSWORD_FILE --wallet-password-file $PASSWORD_FILE
-ret=$?
-if [ $ret -eq 132 ]; then
-    # Check if dill-node is a symbolic link
-    if [ -L "dill-node" ]; then
-	old_target=$(readlink -f "dill-node")
-	old_target_name=$(basename "$old_target")
-        echo "Old symbolic link dill-node linked to $old_target_name deleted"
-        rm -f dill-node
-
-        ln -s ./dill-node_blst_portable dill-node
-	ret=$?
-	if [ $ret -ne 0 ]; then
-	    echo "Create symbolic link dill-node failed"
-	else
-            echo "New symbolic link dill-node created, linked to ./dill-node_blst_portable."
-            ./dill-node accounts import --andes --wallet-dir $KEYSTORE_DIR --keys-dir $KEYS_DIR --accept-terms-of-use --account-password-file $PASSWORD_FILE --wallet-password-file $PASSWORD_FILE
-	fi
-    fi
-fi
+./dill-node accounts import --alps --wallet-dir $KEYSTORE_DIR --keys-dir $KEYS_DIR --accept-terms-of-use --account-password-file $PASSWORD_FILE --wallet-password-file $PASSWORD_FILE
+#ret=$?
+#if [ $ret -eq 132 ]; then
+#    # Check if dill-node is a symbolic link
+#    if [ -L "dill-node" ]; then
+#	old_target=$(readlink -f "dill-node")
+#	old_target_name=$(basename "$old_target")
+#        echo "Old symbolic link dill-node linked to $old_target_name deleted"
+#        rm -f dill-node
+#
+#        ln -s ./dill-node_blst_portable dill-node
+#	ret=$?
+#	if [ $ret -ne 0 ]; then
+#	    echo "Create symbolic link dill-node failed"
+#	else
+#            echo "New symbolic link dill-node created, linked to ./dill-node_blst_portable."
+#            ./dill-node accounts import --andes --wallet-dir $KEYSTORE_DIR --keys-dir $KEYS_DIR --accept-terms-of-use --account-password-file $PASSWORD_FILE --wallet-password-file $PASSWORD_FILE
+#	fi
+#    fi
+#fi
 
 # Start the light validator node
-echo "Starting light validator node..."
-./start_light.sh
+if [ "$deposit_option" == "1" ];then
+    echo "Starting light validator node..."
+    ./start_light.sh
+else 
+    echo "Starting full validator node..."
+    ./start_full.sh
+fi
 
 sleep 3
 # Check if the node is up and running
 echo "Checking if the node is up and running..."
-dill_proc=`ps -ef | grep dill | grep light`
+dill_proc=`ps -ef | grep dill | grep genesis`
 if [ ! -z "$dill_proc" ]; then
     echo "node running, congratulations 😄"
 else 
