@@ -34,6 +34,12 @@ function launch_dill() {
         fi
     else
         if [ "$chip" == "x86_64" ] && [ -f /etc/os-release ];then
+            if ! grep -qi "flags.*:.*adx" /proc/cpuinfo; then
+                echo "Warn: The cpu lacks the required instruction set extension (adx) and may not run properly."
+                echo "But you can also try. Press any key to continue..."
+                read -n 1 -s -r
+            fi
+
             source /etc/os-release
             if [ "$ID" == "ubuntu" ];then
                 major_version=$(echo $VERSION_ID | cut -d. -f1)
