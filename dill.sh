@@ -70,8 +70,23 @@ function add_validator() {
     $DILL_DIR/2_add_validator.sh
 }
 
+function exit_validator() {
+    dill_proc=$(ps axu | grep -v grep | grep dill-node | grep alps | head -n 1)
+    if [ -z "$dill_proc" ];then
+        echo "Dill node not running. Unable to exit validator"
+        exit 1
+    fi
+    rpc_port=4000
+
+    if echo "$dill_proc" | grep -q -- "--rpc-port"; then
+        rpc_port=$(echo $dill_proc | awk -F "--rpc-port" '{print $2}' | awk '{print $1}')
+    fi
+
+    $DILL_DIR/dill-node validator exit --wallet-dir=$DILL_DIR/keystore --beacon-rpc-provider=127.0.0.1:$rpc_port --wallet-password-file=$DILL_DIR/validator_keys/keystore_password.txt
+}
+
 while true; do
-    read -p "Please choose an option for your purpose [1, Launch a new dill node, 2, Add a validator to existing node] [1]: " purpose
+    read -p "Please choose an option for your purpose [1, Launch a new dill node, 2, Add a validator to existing node, 3, Exit a validator] [1]: " purpose
     purpose=${purpose:-1}  # Set default choice to 1
     case "$purpose" in
         "1")
@@ -81,6 +96,10 @@ while true; do
         "2")
             add_validator
             break 
+            ;;
+        "3")
+            exit_validator
+            break
             ;;
         *)
             echo ""
