@@ -93,8 +93,8 @@ A node with a validator is running now, but to become a validator on the Alps ch
 
 ### Add a validator to existing node
 
-- Full node (a full validator is already running by default):you can run multiple full validators or multiple light validators on it.
-- Light node (a light validator is already running by default):you can run multiple light validators on it.
+- Full node (a full validator is already running by default): you can run multiple full validators or multiple light validators on it.
+- Light node (a light validator is already running by default): you can run multiple light validators on it.
 
 Execute the following command to add a validator on the full or light node.
 
@@ -164,3 +164,103 @@ INFO accounts: Imported accounts [<YOUT_PUBLIC_KEY>], view all of them by runnin
 Then the dill node will automatically detect the newly imported validator keys and run the validator.
 
 Next, you still need to stake with the newly generated ./validator_keys/deposit_data-xxxx.json file. Please refer to the link https://dill.xyz/docs/RunANode/Alps#staking for details.
+
+### Some other useful commands
+In the dill directory, there are also some useful scripts that will be used in daily operations.
+
+- Check if the dill node is running healthily
+```bash
+./health_check.sh -v
+```
+
+- View the public key of the validators
+```bash
+./show_pubkey.sh
+```
+
+- Stop the dill node
+```bash
+./stop_dill_node.sh
+```
+
+- Start the dill node
+```bash
+./start_dill_node.sh
+```
+
+- Exit the validator(s)
+
+Exit will return the tokens deposited and rewards to your withdrawal address.
+Run the script and choose which validator(s) to exit.
+```bash
+./exit_validator.sh
+```
+
+## Frequently Asked Questions
+### What to save for node recovery?
+In case of unexpected events like data loss or machine damage, the node must be recovered on the original or a new machine. For security, ensure you save the following items in advance:
+
+- **Single Validator**: Save <span style="color:red;">**the mnemonic**</span> and <span style="color:red;">**the deposit token amount**</span>. <span style="color:orange;">**(Important: Losing these means losing access to your validator!)**</span>
+- **Multiple Validators**: Save <span style="color:red;">**all mnemonics**</span>, <span style="color:red;">**the indices (key numbers) of validator keys**</span>, and <span style="color:red;">**the deposit token amounts**</span>. <span style="color:orange;">**(Important: Ensure all details are backed up securely!)**</span>
+
+### How to recover the dill node?
+
+Then whole recovery steps are as below: 
+1. **move the existing dill directory if existed**:
+
+```bash
+mv dill dill-$(date +%Y%m%d%H%M%S) 
+```
+
+2. **Launch a new dill node**
+
+Rerun this script
+```bash
+curl -sO https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/dill.sh &
+```
+
+Choose [2, Use existing mnemonic] 
+```
+Validator Keys are generated from a mnemonic
+Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]:2
+```
+
+Choose the same option for deposit token amount as before.
+```bash
+Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]:
+```
+
+3. **Add validator(s) to the new node**
+
+If multiple validators were running on the original dill node, in addition to the default validator when launching a new node, the remaining validators need to be added one by one to the new node.
+
+Run the below script, and complete 
+```bash
+ <YOUR_FOLDER_PATH>/dill/2_add_validator.sh
+```
+
+- **Choose existing mnemonic**
+
+```bash
+********** Step 1: Generating Validator Keys **********
+
+Validator Keys are generated from a mnemonic
+Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]:2
+```
+
+- **Choose the deposit token amount and enter withdrawal address**
+
+The option for deposit token amount entered here needs to be the same as the one chosen when adding the same validator on the original node.
+
+```bash
+Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]:
+```
+
+Then provide a withdrawal address, which can be the same or different from the one used previously.
+
+- **Enter the index (key number) you wish to start generating more keys from**:
+
+The index (key number) needs to be the same as you set on the original dill node.
+```bash
+Enter the index (key number) you wish to start generating more keys from. For example, if you've generated 4 keys in the past, you'd enter 4 here. [0]: <YOUR_INDEX>
+```
