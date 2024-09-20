@@ -235,7 +235,7 @@ Validator Keys are generated from a mnemonic
 Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]:2
 ```
 
-Choose the same option for deposit token amount as before.
+Choose the same option for deposit token amount as when launching the original node.
 ```bash
 Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]:
 ```

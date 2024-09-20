@@ -70,21 +70,4 @@ function add_validator() {
     $DILL_DIR/2_add_validator.sh
 }
 
-while true; do
-    read -p "Please choose an option for your purpose [1, Launch a new dill node, 2, Add a validator to existing node] [1]: " purpose
-    purpose=${purpose:-1}  # Set default choice to 1
-    case "$purpose" in
-        "1")
-            launch_dill
-            break
-            ;;
-        "2")
-            add_validator
-            break 
-            ;;
-        *)
-            echo ""
-            echo "[Error] $purpose is not a valid purpose option"
-            ;;
-    esac
-done
+launch_dill
