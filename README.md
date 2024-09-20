@@ -200,8 +200,8 @@ Run the script and choose which validator(s) to exit.
 ### What to save for node recovery?
 In case of unexpected events like data loss or machine damage, the node must be recovered on the original or a new machine. For security, ensure you save the following items in advance:
 
-- **Single Validator**: Save <span style="color:red;">**the mnemonic**</span> and <span style="color:red;">**the deposit token amount**</span>. <span style="color:orange;">**(Important: Losing these means losing access to your validator!)**</span>
-- **Multiple Validators**: Save <span style="color:red;">**all mnemonics**</span>, <span style="color:red;">**the indices (key numbers) of validator keys**</span>, and <span style="color:red;">**the deposit token amounts**</span>. <span style="color:orange;">**(Important: Ensure all details are backed up securely!)**</span>
+- **Single Validator**: Save **the mnemonic** and **the deposit token amount**. **(Important: Losing these means losing access to your validator!)**
+- **Multiple Validators**: Save **all mnemonics**, **the indices (key numbers) of validator keys**, and **the deposit token amounts**. **(Important: Ensure all details are backed up securely!)**
 
 ### How to recover the dill node?
 
