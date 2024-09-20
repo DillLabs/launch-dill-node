@@ -156,9 +156,9 @@ If 'Use existing mnemonic' was chosen earlier, there will be the following input
 Enter the index (key number) you wish to start generating more keys from. For example, if you've generated 4 keys in the past, you'd enter 4 here. [0]: <YOUR_INDEX>
 ```
 
-If no additional validators have been added before, you need to enter 1 here, as a validator has been generated before in "Launch a new dill node" by default.
+If no additional validators have been added, except the one automatically created when launching the dill node, enter `1` here.
 
-If n additional validators have been added in "Add a validator to existing node", then enter n+1 here. 
+If `n` additional validators have been added using "Add a validator to existing node", enter `n + 1` here.
 
 Then the keystore(s) and the deposit(s) will be generated.
 
@@ -200,9 +200,7 @@ In the dill directory, there are also some useful scripts that will be used in d
 ```
 
 - Exit the validator(s)
-
-Exit will return the tokens deposited and rewards to your withdrawal address.
-Run the script and choose which validator(s) to exit.
+Use the Exit script to signal your intentions to permanently stop your duties as a validator.
 ```bash
 ./exit_validator.sh
 ```
@@ -217,10 +215,11 @@ In case of unexpected events like data loss or machine damage, the node must be 
 ### How to recover the dill node?
 
 Then whole recovery steps are as below: 
-1. **move the existing dill directory if existed**:
+1. **Move the existing dill directory and terminate the process**:
 
 ```bash
-mv dill dill-$(date +%Y%m%d%H%M%S) 
+[ -d dill ] && mv dill dill-$(date +%Y%m%d%H%M%S)
+ps aux | grep -i dill | grep -v grep | awk '{print $2}' | xargs -r kill
 ```
 
 2. **Launch a new dill node**
@@ -241,7 +240,7 @@ Choose the same option for deposit token amount as before.
 Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]:
 ```
 
-3. **Add validator(s) to the new node**
+3. **Add validator(s) to the new node (if multiple validators existed)**
 
 If multiple validators were running on the original dill node, in addition to the default validator when launching a new node, the remaining validators need to be added one by one to the new node.
 
