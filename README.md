@@ -1,5 +1,16 @@
 # launch-dill-node
 
+## Table of Contents
+- [Introduction](#introduction)
+- [Tutorial for users](#tutorial-for-users)
+  - [Requirements](#requirements)
+  - [Launch a new dill node](#launch-a-new-dill-node)
+  - [Add a validator to existing node](#add-a-validator-to-existing-node)
+  - [Some other useful commands](#some-other-useful-commands)
+- [Frequently Asked Questions](#frequently-asked-questions)
+  - [What to save for node recovery?](#what-to-save-for-node-recovery)
+  - [How to recover the dill node?](#how-to-recover-the-dill-node)
+
 ## Introduction
 `launch-dill-node` is a collection of scripts for operating the dill node, specifically including launching a new node, adding validators to the launched node, stopping the node, starting the node, viewing the validator's public key, and exiting the validator from chain.
 
