@@ -226,7 +226,7 @@ ps aux | grep -i dill | grep -v grep | awk '{print $2}' | xargs -r kill
 
 Rerun this script
 ```bash
-curl -sO https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/dill.sh &
+curl -sO https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/dill.sh && chmod +x dill.sh && ./dill.sh
 ```
 
 Choose [2, Use existing mnemonic] 
