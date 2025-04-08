@@ -54,9 +54,9 @@ node running, congratulations 😄
 ```bash
 Please select the validator operation [1. add a solo validator, 2. add a pool validator, 3. recover a validator]:
 ```
-- Choose `1` to add a solo validator to your node.
-- Choose `2` to add a pool validator to your node.
-- Choose `3` to recover a validator from mnemonic and add it to your node.
+- Choose `1` to [add a solo validator to your node](#131-Add-a-solo-validator-to-your-node).
+- Choose `2` to [add a pool validator to your node](#132-Add-a-pool-validator-to-your-node).
+- Choose `3` to [recover a validator to your node](#133-Recover-a-validator-to-your-node).
 
 #### 1.3.1 Add a solo validator to your node
 
@@ -228,7 +228,7 @@ Execute the following command to add a validator on the full or light node.
  <YOUR_FOLDER_PATH>/dill/2_add_validator.sh
 ```
 
-Then please refer to [Add a solo validator to your node](#Add-a-solo-validator-to-your-node).
+Then please refer to [Add a solo validator to your node](#131-Add-a-solo-validator-to-your-node).
 
 ## 3 Add a pool staking validator to existing node
 
@@ -240,7 +240,7 @@ Execute the following command to add a validator on the full or light node.
  <YOUR_FOLDER_PATH>/dill/3_add_pool_validator.sh
 ```
 
-Then please refer to [Add a pool validator to your node](#Add-a-pool-validator-to-your-node).
+Then please refer to [Add a pool validator to your node](#132-Add-a-pool-validator-to-your-node).
 
 ## 4 Recover a validator to existing node
 
@@ -250,7 +250,7 @@ Execute the following command to recover your validator key.
  <YOUR_FOLDER_PATH>/dill/4_recover_validator.sh
 ```
 
-Then please refer to [Recover a validator to your node](#Recover-a-validator-to-existing-node).
+Then please refer to [Recover a validator to your node](#133-Recover-a-validator-to-your-node).
 
 ## 5 Other useful commands
 In the dill directory, there are also some useful scripts that will be used in daily operations.
