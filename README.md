@@ -40,7 +40,7 @@ Please select the node type to proceed [1. light, 2. full]:
 - Choose `1` to run a light node.
 - Choose `2` to run a full node.
 
-Mind that, for pool validator you need to run a full node.
+Please note that for pool validator you need to run a full node.
 
 After launching successfully, you should see an output like this:
 
@@ -67,7 +67,7 @@ Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use exis
 ```
 
 - Choose `1` to generate a new mnemonic (ensure you save this securely).
-- Choose `2` if you already have a mnemonic and wish to use it.
+- Choose `2` if you already have a mnemonic and would like to use it.
 
 A withdrawal address is required to complete the next setup
 
@@ -128,7 +128,7 @@ Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use exis
 ```
 
 - Choose `1` to generate a new mnemonic (ensure you save this securely).
-- Choose `2` if you already have a mnemonic and wish to use it.
+- Choose `2` if you already have a mnemonic and would like to use it.
 
 A valid deposit wallet address must be provided. This designated address should be used as the originating account for the deposit transaction.
 
