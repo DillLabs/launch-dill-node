@@ -13,7 +13,7 @@
   - [2.2 Add a solo staking validator to existing node](#22-add-a-solo-staking-validator-to-existing-node)
   - [2.3 Add a pool staking validator to existing node](#23-add-a-pool-staking-validator-to-existing-node)
   - [2.4 Recover a validator to existing node](#24-recover-a-validator-to-existing-node)
-  - [2.5 Some other useful commands](#25-some-other-useful-commands)
+  - [2.5 Other useful commands](#25-other-useful-commands)
 
 ## 1. Introduction
 `launch-dill-node` is a collection of scripts for operating the dill node, specifically including launching a new node, adding validators to the launched node, stopping the node, starting the node, viewing the validator's public key, and exiting the validator from chain.
@@ -252,7 +252,7 @@ Execute the following command to recover your validator key.
 
 Then please refer to [Recover a validator to your node](#Recover-a-validator-to-existing-node).
 
-### 2.5 Some other useful commands
+### 2.5 Other useful commands
 In the dill directory, there are also some useful scripts that will be used in daily operations.
 
 - Check if the dill node is running healthily
