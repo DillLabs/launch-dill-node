@@ -23,7 +23,7 @@
 ### 2.1 Requirements
 The dill node can run on two different operating systems.
 - Ubuntu LTS 20.04+ with x86-64 CPU("adx" instruction set extension required)
-- MacOS with M1/M2 CPU
+- MacOS with M1+ CPU
 
 ### 2.2 Launch a new dill node
 In a host with no dill node running before, follow below steps to launch a new one.
