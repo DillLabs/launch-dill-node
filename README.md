@@ -9,7 +9,7 @@
     - [2.1.3 Generating Validator Key and deposit file](#213-generating-validator-key-and-deposit-file)
       - [Add a solo validator to your node](#add-a-solo-validator-to-your-node)
       - [Add a pool validator to your node](#add-a-pool-validator-to-your-node)
-      - [Recover a validator to existing node](#recover-a-validator-to-existing-node)
+      - [Recover a validator to your node](#recover-a-validator-to-your-node)
   - [2.2 Add a solo staking validator to existing node](#22-add-a-solo-staking-validator-to-existing-node)
   - [2.3 Add a pool staking validator to existing node](#23-add-a-pool-staking-validator-to-existing-node)
   - [2.4 Recover a validator to existing node](#24-recover-a-validator-to-existing-node)
@@ -173,7 +173,7 @@ And the last line of the output is a system-generated reminder indicating the lo
 Pool valildator deposit is written to <YOUR_FOLDER_PATH>/dill/validator_keys/deposit_pool_data-xxxx.json
 ```
 
-##### Recover a validator to existing node
+##### Recover a validator to your node
 
 You will be prompted to enter your mnemonic. Normaly mnemonics can be found at "<YOUR_FOLDER_PATH>/dill/validator_keys":
 
