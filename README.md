@@ -1,36 +1,36 @@
 # launch-dill-node <!-- omit from toc -->
 
 ## Table of Contents <!-- omit from toc -->
-- [1. Introduction](#1-introduction)
-- [2. Tutorial for users](#2-tutorial-for-users)
-  - [2.1 Launch a new dill node](#21-launch-a-new-dill-node)
-    - [2.1.1 Download and Run the Dill Node Script](#211-download-and-run-the-dill-node-script)
-    - [2.1.2 Start dill node](#212-start-dill-node)
-    - [2.1.3 Generating Validator Key and deposit file](#213-generating-validator-key-and-deposit-file)
-      - [Add a solo validator to your node](#add-a-solo-validator-to-your-node)
-      - [Add a pool validator to your node](#add-a-pool-validator-to-your-node)
-      - [Recover a validator to your node](#recover-a-validator-to-your-node)
-  - [2.2 Add a solo staking validator to existing node](#22-add-a-solo-staking-validator-to-existing-node)
-  - [2.3 Add a pool staking validator to existing node](#23-add-a-pool-staking-validator-to-existing-node)
-  - [2.4 Recover a validator to existing node](#24-recover-a-validator-to-existing-node)
-  - [2.5 Other useful commands](#25-other-useful-commands)
+- [Introduction](#introduction)
+- [Tutorial for users](#tutorial-for-users)
+  - [1 Launch a new dill node](#1-launch-a-new-dill-node)
+    - [1.1 Download and Run the Dill Node Script](#11-download-and-run-the-dill-node-script)
+    - [1.2 Start dill node](#12-start-dill-node)
+    - [1.3 Generating Validator Key and deposit file](#13-generating-validator-key-and-deposit-file)
+      - [1.3.1 Add a solo validator to your node](#131-add-a-solo-validator-to-your-node)
+      - [1.3.2 Add a pool validator to your node](#132-add-a-pool-validator-to-your-node)
+      - [1.3.3 Recover a validator to your node](#133-recover-a-validator-to-your-node)
+  - [2 Add a solo staking validator to existing node](#2-add-a-solo-staking-validator-to-existing-node)
+  - [3 Add a pool staking validator to existing node](#3-add-a-pool-staking-validator-to-existing-node)
+  - [4 Recover a validator to existing node](#4-recover-a-validator-to-existing-node)
+  - [5 Other useful commands](#5-other-useful-commands)
 
-# 1. Introduction
+# Introduction
 `launch-dill-node` is a collection of scripts for operating the dill node, specifically including launching a new node, adding validators to the launched node, stopping the node, starting the node, viewing the validator's public key, and exiting the validator from chain.
 
-# 2. Tutorial for users
+# Tutorial for users
 
-## 2.1 Launch a new dill node
+## 1 Launch a new dill node
 In a host with no dill node running before, follow below steps to launch a new one.
 
-### 2.1.1 Download and Run the Dill Node Script
+### 1.1 Download and Run the Dill Node Script
 
 Open your terminal and execute the following command to launch a new Dill node:
 
 ```bash
 curl -sO https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/dill.sh && chmod +x dill.sh && ./dill.sh
 ```
-### 2.1.2 Start dill node
+### 1.2 Start dill node
 
 You need to choose a node type
 
@@ -49,7 +49,7 @@ Checking if the node is up and running...
 node running, congratulations 😄
 ```
 
-### 2.1.3 Generating Validator Key and deposit file
+### 1.3 Generating Validator Key and deposit file
 
 ```bash
 Please select the validator operation [1. add a solo validator, 2. add a pool validator, 3. recover a validator]:
@@ -58,7 +58,7 @@ Please select the validator operation [1. add a solo validator, 2. add a pool va
 - Choose `2` to add a pool validator to your node.
 - Choose `3` to recover a validator from mnemonic and add it to your node.
 
-#### Add a solo validator to your node
+#### 1.3.1 Add a solo validator to your node
 
 You will be prompted to generate your validator key. You can either create a new mnemonic or use an existing one.
 ```bash
@@ -119,7 +119,7 @@ The system displays this confirmation message when the generated key has been su
 [2025-04-07 19:25:15]  INFO accounts: Imported accounts [YOUR_VALIDATOR_PUBLIC_KEY], view all of them by running `accounts list`
 ```
 
-#### Add a pool validator to your node
+#### 1.3.2 Add a pool validator to your node
 
 You will be prompted to generate your validator keys. You can either create a new mnemonic or use an existing one.
 ```bash
@@ -173,7 +173,7 @@ And the last line of the output is a system-generated reminder indicating the lo
 Pool valildator deposit is written to <YOUR_FOLDER_PATH>/dill/validator_keys/deposit_pool_data-xxxx.json
 ```
 
-#### Recover a validator to your node
+#### 1.3.3 Recover a validator to your node
 
 You will be prompted to enter your mnemonic. Normaly mnemonics can be found at "<YOUR_FOLDER_PATH>/dill/validator_keys":
 
@@ -217,7 +217,7 @@ The system displays this confirmation message when the generated key has been su
 [2025-04-07 19:25:15]  INFO accounts: Imported accounts [YOUR_VALIDATOR_PUBLIC_KEY], view all of them by running `accounts list`
 ```
 
-## 2.2 Add a solo staking validator to existing node
+## 2 Add a solo staking validator to existing node
 
 - Full node: you can run multiple full validators.
 - Light node: you can run multiple light validators on it.
@@ -230,7 +230,7 @@ Execute the following command to add a validator on the full or light node.
 
 Then please refer to [Add a solo validator to your node](#Add-a-solo-validator-to-your-node).
 
-## 2.3 Add a pool staking validator to existing node
+## 3 Add a pool staking validator to existing node
 
 ***Pool validators can only be added to a full node.***
 
@@ -242,7 +242,7 @@ Execute the following command to add a validator on the full or light node.
 
 Then please refer to [Add a pool validator to your node](#Add-a-pool-validator-to-your-node).
 
-## 2.4 Recover a validator to existing node
+## 4 Recover a validator to existing node
 
 Execute the following command to recover your validator key.
 
@@ -252,7 +252,7 @@ Execute the following command to recover your validator key.
 
 Then please refer to [Recover a validator to your node](#Recover-a-validator-to-existing-node).
 
-## 2.5 Other useful commands
+## 5 Other useful commands
 In the dill directory, there are also some useful scripts that will be used in daily operations.
 
 - Check if the dill node is running healthily
@@ -275,13 +275,13 @@ In the dill directory, there are also some useful scripts that will be used in d
 ./start_dill_node.sh
 ```
 
-- Exit the validator(s)
+- Exit the validator(s)  
 Use the Exit script to signal your intentions to permanently stop your duties as a validator.
 ```bash
 ./exit_validator.sh
 ```
 
-- Upgrade node type
+- Upgrade node type    
 Use this script to upgrade your light node to full node.
 ```bash
 ./light_to_full.sh
