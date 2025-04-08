@@ -250,7 +250,7 @@ Execute the following command to recover your validator key.
  <YOUR_FOLDER_PATH>/dill/4_recover_validator.sh
 ```
 
-Then please refer to [Recover a validator from mnemonic and add it to your node](#Recover-a-validator-to-existing-node).
+Then please refer to [Recover a validator to your node](#Recover-a-validator-to-existing-node).
 
 ### 2.5 Some other useful commands
 In the dill directory, there are also some useful scripts that will be used in daily operations.
