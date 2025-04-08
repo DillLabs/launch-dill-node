@@ -1,15 +1,26 @@
 # launch-dill-node
 
 ## Table of Contents
-- [Introduction](#introduction)
-- [Tutorial for users](#tutorial-for-users)
-  - [Requirements](#requirements)
-  - [Launch a new dill node](#launch-a-new-dill-node)
-  - [Add a validator to existing node](#add-a-validator-to-existing-node)
-  - [Some other useful commands](#some-other-useful-commands)
-- [Frequently Asked Questions](#frequently-asked-questions)
-  - [What to save for node recovery?](#what-to-save-for-node-recovery)
-  - [How to recover the dill node?](#how-to-recover-the-dill-node)
+- [launch-dill-node](#launch-dill-node)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Tutorial for users](#tutorial-for-users)
+    - [Requirements](#requirements)
+    - [Launch a new dill node](#launch-a-new-dill-node)
+      - [Step 1: Download and Run the Dill Node Script](#step-1-download-and-run-the-dill-node-script)
+      - [Step 2: Start dill node](#step-2-start-dill-node)
+      - [Step 3: Generating Validator Key and deposit file](#step-3-generating-validator-key-and-deposit-file)
+        - [Add a solo validator to your node](#add-a-solo-validator-to-your-node)
+        - [Add a pool validator to your node](#add-a-pool-validator-to-your-node)
+        - [Recover a validator from mnemonic and add it to your node](#recover-a-validator-from-mnemonic-and-add-it-to-your-node)
+    - [Add a solo staking validator to existing node](#add-a-solo-staking-validator-to-existing-node)
+    - [Add a pool staking validator to existing node](#add-a-pool-staking-validator-to-existing-node)
+    - [Add a pool staking validator to existing node](#add-a-pool-staking-validator-to-existing-node-1)
+    - [Recover a validator from mnemonic and add it to your node](#recover-a-validator-from-mnemonic-and-add-it-to-your-node-1)
+    - [Some other useful commands](#some-other-useful-commands)
+  - [Frequently Asked Questions](#frequently-asked-questions)
+    - [What to save for node recovery?](#what-to-save-for-node-recovery)
+    - [How to recover the dill node?](#how-to-recover-the-dill-node)
 
 ## Introduction
 `launch-dill-node` is a collection of scripts for operating the dill node, specifically including launching a new node, adding validators to the launched node, stopping the node, starting the node, viewing the validator's public key, and exiting the validator from chain.
@@ -30,45 +41,65 @@ Open your terminal and execute the following command to launch a new Dill node:
 ```bash
 curl -sO https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/dill.sh && chmod +x dill.sh && ./dill.sh
 ```
+#### Step 2: Start dill node
 
-#### Step 2: Generating Validator Keys
-1. **Choose a new or existing mnemonic**:
-
-Next, you will be prompted to generate your validator keys. You can either create a new mnemonic or use an existing one.
+You need to choose a node type
 
 ```bash
-********** Step 2: Generating Validator Keys **********
+Please select the node type to proceed [1. light, 2. full]: 
+```
+- Choose `1` to run a light node.
+- Choose `2` to run a full node.
 
+Mind that, for pool validator you need to run a full node.
+
+After launching successfully, you should see an output like this:
+
+```
+Checking if the node is up and running...
+node running, congratulations 😄
+```
+
+#### Step 3: Generating Validator Key and deposit file
+
+```bash
+Please select the validator operation [1. add a solo validator, 2. add a pool validator, 3. recover a validator]:
+```
+- Choose `1` to add a solo validator to your node.
+- Choose `2` to add a pool validator to your node.
+- Choose `3` to recover a validator from mnemonic and add it to your node.
+
+##### Add a solo validator to your node
+
+You will be prompted to generate your validator key. You can either create a new mnemonic or use an existing one.
+```bash
 Validator Keys are generated from a mnemonic
-Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]:
+Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]: 
 ```
 
 - Choose `1` to generate a new mnemonic (ensure you save this securely).
 - Choose `2` if you already have a mnemonic and wish to use it.
 
-2. **Choose the deposit token amount and enter withdrawal address**:
-
-Next, you will be asked to select the deposit token amount for staking, 
+A withdrawal address is required to complete the next setup
 
 ```bash
-Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]:
-```
-   - Option `1`: 3600 DILL (run a light node with a light validator)
-   - Option `2`: 36000 DILL (run a full node with a full validator)
-
-then need to provide a withdrawal address.
-
-```bash
-Please enter your withdrawal address: <YOUR_WITHDRAWAL_ADDRESS>
-
-**[Warning] you are setting an Eth1 address as your withdrawal address. Please ensure that you have control over this address.**
-
-Repeat your withdrawal address for confirmation.: <YOUR_WITHDRAWAL_ADDRESS>
-
-**[Warning] you are setting an Eth1 address as your withdrawal address. Please ensure that you have control over this address.**
+Please enter your withdrawal address:
 ```
 
-You will see the following messages after successfully generated the keystore(s) and the deposit(s):
+And also a deposit amount. For full node it's like:
+```bash 
+Please enter a deposit amount from [3600, 7200, ...,  36000]:
+```
+
+and for light node:
+```bash 
+Please enter a deposit amount from [3600, 7200, ...,  32400]:
+```
+
+To achieve full validator status, a stake of 36,000 tokens is required. If the staked amount is below this threshold, the validator will operate as a light validator.
+The staked amount must be a multiple of 3,600.
+
+You will see the following messages after successfully generated the validator key and the deposit:
 
 ```bash
                        _______       __     __     __
@@ -92,20 +123,115 @@ Your keys can be found at: <YOUR_FOLDER_PATH>/dill/validator_keys
 
 The generated file <YOUR_FOLDER_PATH>/dill/validator_keys/deposit_data-xxxx.json is required for staking later.
 
-#### Step 3: Import keys and start dill-node
-After launching successfully, you should see an output like this:
 
+The system displays this confirmation message when the generated key has been successfully added to the node.
+
+```bash
+[2025-04-07 19:25:15]  INFO accounts: Imported accounts [YOUR_VALIDATOR_PUBLIC_KEY], view all of them by running `accounts list`
 ```
-Checking if the node is up and running...
-node running, congratulations 😄
+
+##### Add a pool validator to your node
+
+You will be prompted to generate your validator keys. You can either create a new mnemonic or use an existing one.
+```bash
+Validator Keys are generated from a mnemonic
+Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]: 
 ```
 
-A node with a validator is running now, but to become a validator on the Alps chain, you still need to perform staking. Please refer to the link https://dill.xyz/docs/RunANode/Alps#staking for details.
+- Choose `1` to generate a new mnemonic (ensure you save this securely).
+- Choose `2` if you already have a mnemonic and wish to use it.
 
-### Add a validator to existing node
+A valid deposit wallet address must be provided. This designated address should be used as the originating account for the deposit transaction.
 
-- Full node (a full validator is already running by default): you can run multiple full validators or multiple light validators on it.
-- Light node (a light validator is already running by default): you can run multiple light validators on it.
+```bash
+Please input your deposit wallet address:
+```
+
+The system will prompt for validator runtime duration specification. Upon reaching the specified duration threshold, the validator will automatically exit.
+
+```bash
+Please select validator running duration [1: 45 days, 2: 90 days] [1]:
+```
+
+- Choose `1` the pool validator will run for 45 days.
+- Choose `2` the pool validator will run for 90 days.
+
+You will see the following messages after successfully generated the validator key and the deposit:
+
+```bash
+                       _______       __     __     __
+                      |       \     (__)   |  |   |  |
+                      |   ___  \     __    |  |   |  |
+                      |  |   |  |   |  |   |  |   |  |
+                      |  |   |  |   |  |   |  |   |  |
+                      |  |   |  |   |  |   |  |   |  |
+                      |  |___|  |   |  |   |  |   |  |
+                      |        /    |  |   |  |   |  |
+                      |_______/     |__|   |__|   |__|
+
+Creating your keys.
+Creating your keystores:	  [####################################]  1/1
+Verifying your keystores:	  [####################################]  1/1
+Verifying your deposits:	  [####################################]  1/1
+
+Success!
+Your keys can be found at: <YOUR_FOLDER_PATH>/dill/validator_keys
+```
+
+And the last line of the output is a system-generated reminder indicating the location of the deposit file:
+
+```bash 
+Pool valildator deposit is written to <YOUR_FOLDER_PATH>/dill/validator_keys/deposit_pool_data-xxxx.json
+```
+
+##### Recover a validator from mnemonic and add it to your node
+
+You will be prompted to enter your mnemonic. Normaly mnemonics can be found at "<YOUR_FOLDER_PATH>/dill/validator_keys":
+
+```bash 
+Enter your existing mnemonic:
+```
+
+The system will prompt for a validator index input:
+
+```bash
+Please enter a number as your validator public key index:
+```
+
+When unspecified, the system automatically assigns `0` as the default public key index value.
+
+You will see the following messages after successfully generated the validator key:
+
+```bash
+                       _______       __     __     __
+                      |       \     (__)   |  |   |  |
+                      |   ___  \     __    |  |   |  |
+                      |  |   |  |   |  |   |  |   |  |
+                      |  |   |  |   |  |   |  |   |  |
+                      |  |   |  |   |  |   |  |   |  |
+                      |  |___|  |   |  |   |  |   |  |
+                      |        /    |  |   |  |   |  |
+                      |_______/     |__|   |__|   |__|
+
+Creating your keys.
+Creating your keystores:	  [####################################]  1/1
+Verifying your keystores:	  [####################################]  1/1
+Verifying your deposits:	  [####################################]  1/1
+
+Success!
+Your keys can be found at: <YOUR_FOLDER_PATH>/dill/validator_keys
+```
+
+The system displays this confirmation message when the generated key has been successfully added to the node.
+
+```bash
+[2025-04-07 19:25:15]  INFO accounts: Imported accounts [YOUR_VALIDATOR_PUBLIC_KEY], view all of them by running `accounts list`
+```
+
+### Add a solo staking validator to existing node
+
+- Full node: you can run multiple full validators.
+- Light node: you can run multiple light validators on it.
 
 Execute the following command to add a validator on the full or light node.
 
@@ -113,75 +239,48 @@ Execute the following command to add a validator on the full or light node.
  <YOUR_FOLDER_PATH>/dill/2_add_validator.sh
 ```
 
-#### Step 1: Generating Validator Keys
+Then please refer to [Add a solo validator to your node](#Add-a-solo-validator-to-your-node).
 
-1. **Choose a new or existing mnemonic**:
+### Add a pool staking validator to existing node
 
-```bash
-********** Step 1: Generating Validator Keys **********
+***Pool validators can only be added to a full node.***
 
-Validator Keys are generated from a mnemonic
-Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]:
-```
-
-- Choose `1` to generate a new mnemonic (ensure you save this securely).
-- Choose `2` if you already have a mnemonic and wish to use it.
-
-Choosing option 1 is analogous to the process described in 'Launch a new dill node'; But if option 2 is chosen, the index (key number) needs to be entered later.
-
-2. **Choose the deposit token amount and enter withdrawal address**:
+Execute the following command to add a validator on the full or light node.
 
 ```bash
-Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]:
-```
-   - Option `1`: 3600 DILL (add a light validator)
-   - Option `2`: 36000 DILL (add a full validator)
-
-then need to provide a withdrawal address.
-```bash
-Please enter your withdrawal address: <YOUR_WITHDRAWAL_ADDRESS>
-
-**[Warning] you are setting an Eth1 address as your withdrawal address. Please ensure that you have control over this address.**
-
-Repeat your withdrawal address for confirmation.: <YOUR_WITHDRAWAL_ADDRESS>
-
-**[Warning] you are setting an Eth1 address as your withdrawal address. Please ensure that you have control over this address.**
+ <YOUR_FOLDER_PATH>/dill/3_add_pool_validator.sh
 ```
 
-If 'Use existing mnemonic' was chosen earlier, there will be the following input options.
+Then please refer to [Add a pool validator to your node](#Add-a-pool-validator-to-your-node).
 
-3. **Enter the index (key number) you wish to start generating more keys from**:
+### Add a pool staking validator to existing node
+
+***Pool validators can only be added to a full node.***
+
+Execute the following command to add a validator on the full or light node.
 
 ```bash
-Enter the index (key number) you wish to start generating more keys from. For example, if you've generated 4 keys in the past, you'd enter 4 here. [0]: <YOUR_INDEX>
+ <YOUR_FOLDER_PATH>/dill/3_add_pool_validator.sh
 ```
 
-If no additional validators have been added, except the one automatically created when launching the dill node, enter `1` here.
+Then please refer to [Add a pool validator to your node](#Add-a-pool-validator-to-your-node).
 
-If `n` additional validators have been added using "Add a validator to existing node", enter `n + 1` here.
+### Recover a validator from mnemonic and add it to your node
 
-Then the keystore(s) and the deposit(s) will be generated.
-
-Please remember to save the mnemonic and index, as both are necessary to generate the correct validator key, which is needed to recover or migrate the dill node.
-
-#### Step 2: Import keys
-
-After importing keys successfully, you should see an output like this:
+Execute the following command to recover your validator key.
 
 ```bash
-INFO accounts: Imported accounts [<YOUT_PUBLIC_KEY>], view all of them by running `accounts list`
+ <YOUR_FOLDER_PATH>/dill/4_recover_validator.sh
 ```
 
-Then the dill node will automatically detect the newly imported validator keys and run the validator.
-
-Next, you still need to stake with the newly generated ./validator_keys/deposit_data-xxxx.json file. Please refer to the link https://dill.xyz/docs/RunANode/Alps#staking for details.
+Then please refer to [Recover a validator from mnemonic and add it to your node](#Recover-a-validator-from-mnemonic-and-add-it-to-your-node).
 
 ### Some other useful commands
 In the dill directory, there are also some useful scripts that will be used in daily operations.
 
 - Check if the dill node is running healthily
 ```bash
-./health_check.sh -v
+./health_check.sh
 ```
 
 - View the public key of the validators
@@ -228,17 +327,11 @@ Rerun this script
 ```bash
 curl -sO https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/dill.sh && chmod +x dill.sh && ./dill.sh
 ```
-
-Choose [2, Use existing mnemonic] 
-```
-Validator Keys are generated from a mnemonic
-Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]:2
-```
-
-Choose the same option for deposit token amount as when launching the original node.
 ```bash
-Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]:
+Please select the validator operation [1. add a solo validator, 2. add a pool validator, 3. recover a validator]:
 ```
+
+Choose `3`, recover a validator from mnemonic and add it to your node.
 
 3. **Add validator(s) to the new node (if multiple validators existed)**
 
@@ -246,31 +339,5 @@ If multiple validators were running on the original dill node, in addition to th
 
 Run the below script, and complete 
 ```bash
- <YOUR_FOLDER_PATH>/dill/2_add_validator.sh
-```
-
-- **Choose existing mnemonic**
-
-```bash
-********** Step 1: Generating Validator Keys **********
-
-Validator Keys are generated from a mnemonic
-Please choose an option for mnemonic source [1, From a new mnemonic, 2, Use existing mnemonic] [1]:2
-```
-
-- **Choose the deposit token amount and enter withdrawal address**
-
-The option for deposit token amount entered here needs to be the same as the one chosen when adding the same validator on the original node.
-
-```bash
-Please choose an option for deposit token amount [1, 3600, 2, 36000] [1]:
-```
-
-Then provide a withdrawal address, which can be the same or different from the one used previously.
-
-- **Enter the index (key number) you wish to start generating more keys from**:
-
-The index (key number) needs to be the same as you set on the original dill node.
-```bash
-Enter the index (key number) you wish to start generating more keys from. For example, if you've generated 4 keys in the past, you'd enter 4 here. [0]: <YOUR_INDEX>
+ <YOUR_FOLDER_PATH>/dill/4_recover_validator.sh
 ```
