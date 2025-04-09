@@ -4,7 +4,7 @@
 - [Introduction](#introduction)
 - [Tutorial for users](#tutorial-for-users)
   - [1 Launch a new dill node](#1-launch-a-new-dill-node)
-    - [1.1 Download and Run the Dill Node Script](#11-download-and-run-the-dill-node-script)
+    - [1.1 Download and Run the Dill Node](#11-download-and-run-the-dill-node)
     - [1.2 Start dill node](#12-start-dill-node)
     - [1.3 Generating Validator Key and deposit file](#13-generating-validator-key-and-deposit-file)
       - [1.3.1 Add a solo validator to your node](#131-add-a-solo-validator-to-your-node)
@@ -23,7 +23,7 @@
 ## 1 Launch a new dill node
 In a host with no dill node running before, follow below steps to launch a new one.
 
-### 1.1 Download and Run the Dill Node Script
+### 1.1 Download and Run the Dill Node
 
 Open your terminal and execute the following command to launch a new Dill node:
 
