@@ -276,13 +276,16 @@ In the dill directory, there are also some useful scripts that will be used in d
 ```
 
 - Exit the validator(s)  
-Use the Exit script to signal your intentions to permanently stop your duties as a validator.
 ```bash
 ./exit_validator.sh
 ```
 
+- Update node version    
+```bash
+curl -sO https://raw.githubusercontent.com/DillLabs/launch-dill-node/main/upgrade.sh && chmod +x upgrade.sh && ./upgrade.sh
+```
+
 - Upgrade node type    
-Use this script to upgrade your light node to full node.
 ```bash
 ./light_to_full.sh
 ```
