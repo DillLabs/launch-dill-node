@@ -12,6 +12,10 @@ tlog() {
 }
 
 get_latest_version() {
+    if [ ! -z "$DILL_VERSION" ]; then
+	return 0
+    fi
+
     latest_release_url="https://dill-release.s3.ap-southeast-1.amazonaws.com/version.txt"
     DILL_VERSION=`curl -s $latest_release_url`
     return $?
@@ -28,7 +32,7 @@ is_dill_folder() {
     fi
 
     md5cmd=md5sum
-    if [ "$OS_TYPE" == "darwin" ]; then
+    if [ "$OS_TYPE" == "darwin-arm64" ]; then
         md5cmd=md5
     fi
 
@@ -78,26 +82,6 @@ check_health() {
     fi
 }
 
-download_assets() {
-    BASE_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/$DILL_VERSION/$OS_TYPE"
-    DILL_ASSETS_LIST_URL="$BASE_URL/assets.txt"
-    curl -O $DILL_ASSETS_LIST_URL
-    while read file; do
-        tlog upgrading $file
-        [ -f "$file" ] && mv $file $DILL_BACKUP_DIR/$file
-        curl -O "$BASE_URL/$file"
-        if [ $? -ne 0 ]; then
-            tlog upgrade $file failed
-            return 1
-        fi
-        # grant exe perm to shell scripts
-        extension="${file##*.}"
-        if [ "$extension" == "sh" ]; then
-            chmod +x $file
-        fi
-    done < ./assets.txt
-}
-
 is_latest_dill_running() {
     check_health
     if [ $? -ne 0 ]; then
@@ -118,7 +102,7 @@ find_os_type() {
         if [ "$chip" == "arm64" ];then
             echo "Supported, os_type: $os_type, chip: $chip"
             if [ "$download" != "0" ];then
-                OS_TYPE="darwin"
+                OS_TYPE="darwin-arm64"
             fi
         else
             echo "Unsupported, os_type: $os_type, chip: $chip"
@@ -138,7 +122,7 @@ find_os_type() {
                 if [ $major_version -ge 20 ]; then
                     echo "Supported, os: $ID $VERSION_ID, chip: $chip"; echo""
                     if [ "$download" != "0" ];then
-                        OS_TYPE="linux"
+                        OS_TYPE="linux-amd64"
                     fi
                 else
                     echo "Unsupported, os: $ID $VERSION_ID (ubuntu 20.04+ required)"
@@ -156,37 +140,46 @@ find_os_type() {
 }
 
 function upgrade_dill() {
-    cd $DILL_DIR
     now=`date +%s`
+    DILL_BIN_FOLDER="$DILL_DIR/bin"
     DILL_BACKUP_DIR="$DILL_DIR/backups/$now"
+    tmp_folder_name="$DILL_BIN_FOLDER/tmp_dill_$now"
+    mkdir -p $DILL_BIN_FOLDER
     mkdir -p $DILL_BACKUP_DIR
+    mkdir -p $tmp_folder_name
     tlog upgrading dill node
     tlog current scripts or binary files will be moved to $DILL_BACKUP_DIR
+    cd $DILL_BIN_FOLDER
 
-    base_url="https://dill-release.s3.ap-southeast-1.amazonaws.com/$DILL_VERSION"
-
-    # download scripts
-    download_assets
+    # download new tar package
+    FILE_NAME=dill-$DILL_VERSION-$OS_TYPE.tar.gz
+    FILE_URL="https://dill-release.s3.ap-southeast-1.amazonaws.com/$DILL_VERSION/$FILE_NAME"
+    curl -O $FILE_URL
     if [ $? -ne 0 ]; then
-        tlog download script files failed
+        tlog "download latest binary package failed"
         return 1
     fi
-
+    
+    # update all files
+    tar -xzvf $FILE_NAME -C $tmp_folder_name
+    cd $tmp_folder_name/dill
+    chmod +x dill-node
     chmod +x ./stop_dill_node.sh
     chmod +x ./start_dill_node.sh
-
-    curl -o dill-node-new $base_url/$OS_TYPE/dill-node
-    chmod +x dill-node-new
-    ./dill-node-new --version | grep $DILL_VERSION
+    ./dill-node --version | grep $DILL_VERSION
     if [ $? -ne 0 ]; then
         tlog binary downloaded is not the latest one, please contact dill team
         return 1
     fi
-
-    # update binaries
-    [ -f "dill-node" ] && mv dill-node $DILL_BACKUP_DIR/dill-node-back
-    mv dill-node-new dill-node
     
+    for file in `ls`; do
+	[ -f "$DILL_DIR/$file" ] && mv $DILL_DIR/$file $DILL_BACKUP_DIR/$file
+	mv $file $DILL_DIR/$file
+    done
+   
+    # restart dill node
+    cd $DILL_DIR
+     
     ./stop_dill_node.sh
     if [ $? -ne 0 ]; then
         tlog stop dill node failed
@@ -198,6 +191,9 @@ function upgrade_dill() {
         tlog start dill node failed
         return 1
     fi
+
+    # clean up temp files
+    rm -rf $tmp_folder_name
 }
 
 download=1
